@@ -1,4 +1,4 @@
-Losc,Pierre Mauroy,9,6,4,2,0,14
+Losc,Pierre Mauroy,9,8,4,4,0,16
 Paris,Parc des Princes,0,3,0,1,2,1
 Nice,Alliance Riviera,1,3,1,0,1,4
-Lyon,Groupama Statium,0,6,0,3,3,3
+Lyon,Groupama Statium,0,8,0,5,3,5
