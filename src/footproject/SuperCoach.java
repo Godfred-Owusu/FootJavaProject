@@ -11,10 +11,10 @@ package footproject;
 public class SuperCoach extends Coach {
     private boolean havePaidRef;
 
-    public SuperCoach(String commonName, String firstName, String surname, String placeOfBirth, 
-                      String dateOfBirth, String nationality, int size, int weight, 
+    public SuperCoach(String commonName, String firstName,  
+                      String nationality, 
                       int experienceYears, Teams team, boolean havePaidRef) {
-        super(commonName, firstName, surname, placeOfBirth, dateOfBirth, nationality, size, weight, experienceYears, team);
+        super(commonName, firstName, nationality, experienceYears, team);
         this.havePaidRef = havePaidRef;
     }
 }

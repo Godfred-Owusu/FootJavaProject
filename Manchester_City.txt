@@ -1,0 +1,36 @@
+Team Name: Manchester City
+Home Stadium: Etihad Stadium
+Coach: Guardiola
+Nationality: Spanish
+Experience: 20 years
+Yellow Cards: 0
+Red Cards: 0
+Total Goals: 0
+Matches Played: 0
+Wins: 0
+Draws: 0
+Losses: 0
+Points: 0
+
+Player:
+  Name: Haaland
+  Position: Forward
+  Number: 9
+  Sponsor: Nike
+  Nationality: Norwegian
+  Goals: 0
+  Assists: 0
+  Yellow Cards: 0
+  Red Cards: 0
+  Injured: No
+Player:
+  Name: De Bruyne
+  Position: Midfielder
+  Number: 17
+  Sponsor: Adidas
+  Nationality: Belgian
+  Goals: 0
+  Assists: 0
+  Yellow Cards: 0
+  Red Cards: 0
+  Injured: No

@@ -1,110 +1,22 @@
-//package footproject;
-//
-//import java.io.BufferedReader;
-//import java.io.BufferedWriter;
-//import java.io.FileReader;
-//import java.io.FileWriter;
-//import java.io.IOException;
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//public class Matchs {
-//    
-//    private List<Teams> teams;
-//    private String result;
-//     
-//    public Matchs(List<Teams> teams, String result){
-//        this.teams = teams;
-//        this.result = result;
-//        
-//        if(result.equals(teams.get(0).getTeamName())){
-//            updateClassement(teams.get(0), teams.get(1), false);  
-//        }
-//        else if(result.equals(teams.get(1).getTeamName())){
-//            updateClassement(teams.get(1), teams.get(0), false);  
-//        }
-//        else {
-//            updateClassement(teams.get(0), teams.get(1), true);  
-//        }
-//    }
-//    
-//    public void updateClassement(Teams gagnant, Teams perdant, boolean isDraw) {
-//        String filePath = "Ligue1";  
-//        List<String[]> teamsData = new ArrayList<>();
-//
-//        try (BufferedReader reader = new BufferedReader(new FileReader(filePath + ".txt"))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                String[] teamData = line.split(",");
-//                teamsData.add(teamData);
-//            }
-//        } catch (IOException e) {
-//            System.out.println("Error reading file: " + e.getMessage());
-//            return;
-//        }
-//
-//        for (String[] teamData : teamsData) {
-//            if (teamData[0].equals(gagnant.getTeamName())) {
-//                if(isDraw){
-//                    teamData[3] = String.valueOf(Integer.parseInt(teamData[3]) + 1);  // +1 match
-//                    teamData[5] = String.valueOf(Integer.parseInt(teamData[5]) + 1);  // +1 nul
-//                    teamData[7] = String.valueOf(Integer.parseInt(teamData[7]) + 1);  // +1 point
-//                } else {
-//                    
-//                    teamData[3] = String.valueOf(Integer.parseInt(teamData[3]) + 1);  // +1 match
-//                    teamData[4] = String.valueOf(Integer.parseInt(teamData[4]) + 1);  // +1 win
-//                    teamData[7] = String.valueOf(Integer.parseInt(teamData[7]) + 3);  // +3 points
-//                }
-//            }
-//            else if (teamData[0].equals(perdant.getTeamName())) {
-//                if (isDraw) {
-//                    teamData[3] = String.valueOf(Integer.parseInt(teamData[3]) + 1);  // +1 match
-//                    teamData[5] = String.valueOf(Integer.parseInt(teamData[5]) + 1);  // +1 nul
-//                    teamData[7] = String.valueOf(Integer.parseInt(teamData[7]) + 1);  // +1 point pour les deux équipes
-//                } else {
-//                    teamData[3] = String.valueOf(Integer.parseInt(teamData[3]) + 1);  // +1 match
-//                    teamData[6] = String.valueOf(Integer.parseInt(teamData[6]) + 1);  // +1 défaite
-//                }
-//            }
-//        }
-//
-//        // Réécrire le fichier avec les nouvelles données
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath + ".txt"))) {
-//            for (String[] teamData : teamsData) {
-//                writer.write(String.join(",", teamData));
-//                writer.newLine();
-//            }
-//        } catch (IOException e) {
-//            System.out.println("Error writing to file: " + e.getMessage());
-//        }
-//    }
-//}
-
-
-
 package footproject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 
 public class Matchs {
     private Teams userTeam;
     private Teams opponentTeam;
     private int userScore;
     private int opponentScore;
+    private Random random = new Random();
 
-    public Matchs(Teams userTeam, Teams opponentTeam, int userScore) {
+    public Matchs(Teams userTeam, Teams opponentTeam) {
         this.userTeam = userTeam;
         this.opponentTeam = opponentTeam;
-        this.userScore = userScore;
-        this.opponentScore = generateRandomScore();
+        this.userScore = generateRealisticScore();
+        this.opponentScore = generateRealisticScore();
 
         System.out.println("Your team scored: " + userScore);
         System.out.println("Opponent team scored: " + opponentScore);
@@ -121,59 +33,104 @@ public class Matchs {
         }
     }
 
-    private int generateRandomScore() {
-        Random random = new Random();
-        return random.nextInt(11);  // Generate a random score between 0 and 10
-    }
+    private int generateRealisticScore() {
+        double lambda = 1.5;  // Moyenne de buts par équipe
+        double l = Math.exp(-lambda);
+        int k = 0;
+        double p = 1.0;
 
+        do {
+            k++;
+            p *= random.nextDouble();
+        } while (p > l);
+
+        return k - 1;
+    }
+    
     public void updateClassement(Teams winner, Teams loser, boolean isDraw) {
-        String filePath = "Ligue1";  
+        String filePath = "Ligue1.txt";  
         List<String[]> teamsData = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath + ".txt"))) {
+        // Charger les données existantes depuis le fichier
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] teamData = line.split(",");
-                teamsData.add(teamData);
+                if (teamData.length == 8) {  // Vérifie que chaque ligne a le bon nombre de colonnes
+                    teamsData.add(teamData);
+                } else {
+                    System.out.println("Skipping malformed line: " + line);
+                }
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found. Creating a new file.");
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
             return;
         }
 
+        // Ajout d'équipes si elles n'existent pas
+        if (findTeam(teamsData, winner.getTeamName()) == null) {
+            teamsData.add(new String[]{winner.getTeamName(), "0", "0", "0", "0", "0", "0", "0"});
+        }
+        if (findTeam(teamsData, loser.getTeamName()) == null) {
+            teamsData.add(new String[]{loser.getTeamName(), "0", "0", "0", "0", "0", "0", "0"});
+        }
+
+        // Mise à jour des statistiques
         for (String[] teamData : teamsData) {
             if (teamData[0].equals(winner.getTeamName())) {
                 if (isDraw) {
                     teamData[3] = String.valueOf(Integer.parseInt(teamData[3]) + 1);  // +1 match
-                    teamData[5] = String.valueOf(Integer.parseInt(teamData[5]) + 1);  // +1 draw
+                    teamData[5] = String.valueOf(Integer.parseInt(teamData[5]) + 1);  // +1 nul
                     teamData[7] = String.valueOf(Integer.parseInt(teamData[7]) + 1);  // +1 point
                 } else {
                     teamData[3] = String.valueOf(Integer.parseInt(teamData[3]) + 1);  // +1 match
-                    teamData[4] = String.valueOf(Integer.parseInt(teamData[4]) + 1);  // +1 win
+                    teamData[4] = String.valueOf(Integer.parseInt(teamData[4]) + 1);  // +1 victoire
                     teamData[7] = String.valueOf(Integer.parseInt(teamData[7]) + 3);  // +3 points
                 }
             } else if (teamData[0].equals(loser.getTeamName())) {
                 if (isDraw) {
                     teamData[3] = String.valueOf(Integer.parseInt(teamData[3]) + 1);  // +1 match
-                    teamData[5] = String.valueOf(Integer.parseInt(teamData[5]) + 1);  // +1 draw
+                    teamData[5] = String.valueOf(Integer.parseInt(teamData[5]) + 1);  // +1 nul
                     teamData[7] = String.valueOf(Integer.parseInt(teamData[7]) + 1);  // +1 point
                 } else {
                     teamData[3] = String.valueOf(Integer.parseInt(teamData[3]) + 1);  // +1 match
-                    teamData[6] = String.valueOf(Integer.parseInt(teamData[6]) + 1);  // +1 loss
+                    teamData[6] = String.valueOf(Integer.parseInt(teamData[6]) + 1);  // +1 défaite
                 }
             }
         }
 
-        // Write updated data back to file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath + ".txt"))) {
+        // Écriture des données mises à jour dans le fichier
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (String[] teamData : teamsData) {
                 writer.write(String.join(",", teamData));
                 writer.newLine();
             }
+            System.out.println("Successfully written updated data to file.");
         } catch (IOException e) {
             System.out.println("Error writing to file: " + e.getMessage());
         }
-    }
+        
+        String currentDir = System.getProperty("user.dir");
 
-   
+        // Mise à jour des fichiers des équipes
+        /*
+        // Mise à jour des fichiers des équipes avec leurs nouvelles statistiques
+        winner.saveTeamToFile(currentDir + "/" + winner.getTeamName() + ".txt");
+        loser.saveTeamToFile(currentDir + "/" + loser.getTeamName() + ".txt");
+        */
+    }
+    
+    
+
+    // Méthode pour trouver une équipe dans la liste des données
+    private String[] findTeam(List<String[]> teamsData, String teamName) {
+        for (String[] team : teamsData) {
+            if (team[0].equals(teamName)) {
+                return team;
+            }
+        }
+        return null;  // retourne null si l'équipe n'est pas trouvée
+    }
 }

@@ -1,0 +1,25 @@
+Team Name: Lille
+Home Stadium: Stade Pierre-Mauroy
+Coach: Génésio
+Nationality: French
+Experience: 15 years
+Yellow Cards: 0
+Red Cards: 0
+Total Goals: 0
+Matches Played: 0
+Wins: 0
+Draws: 0
+Losses: 0
+Points: 0
+
+Player:
+  Name: David
+  Position: Forward
+  Number: 9
+  Sponsor: Puma
+  Nationality: Canadian
+  Goals: 0
+  Assists: 0
+  Yellow Cards: 0
+  Red Cards: 0
+  Injured: No

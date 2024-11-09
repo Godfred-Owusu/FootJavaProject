@@ -13,7 +13,7 @@ public class Viewer extends Person {
 
     public Viewer(String commonName, String firstName, String surname, String placeOfBirth, 
                   String dateOfBirth, String nationality, int size, int weight, Teams supportTeam) {
-        super(commonName, firstName, surname, placeOfBirth, dateOfBirth, nationality, size, weight);
+        super(commonName, firstName, nationality);
         this.supportTeam = supportTeam;
     }
 }

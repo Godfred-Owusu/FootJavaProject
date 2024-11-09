@@ -1,74 +1,77 @@
-
 package footproject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
-/**
- *
- * @author methiss
- */
+import java.io.File;
+
+
 public class FootProject {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
-         Scanner scanner = new Scanner(System.in);
-        // TODO code application logic here  FOOT PROJECT
-        
-        String currentDir = System.getProperty("user.dir"); // Répertoire courant
+        Scanner scanner = new Scanner(System.in);
+        String currentDir = System.getProperty("user.dir");
         String filePath = currentDir + "/Ligue1.txt";
-
         System.out.println("Le fichier sera enregistré ici : " + filePath);
-                
-        Teams Lyon = new Teams("Lyon", "Groupama Statium");
-        Teams Lille = new Teams("Losc", "Pierre Mauroy");
-        
+
         Competition ligue1 = new Competition();
-        
         ligue1.printLeaderboard("Ligue1");
+
+        // Création et ajout des équipes et des coachs
+        Coach coachCity = new Coach("Guardiola", "Pep", "Spanish", 20, null);
+        Teams teamCity = new Teams("Manchester City", "Etihad Stadium", coachCity);
         
-          
-        List<Teams> teamsList = new ArrayList<>();
-        teamsList.add(Lyon);
-        teamsList.add(Lille);
+        Coach coachLille = new Coach("Génésio", "Bruno", "French", 15, null);
+        Teams teamLille = new Teams("Lille", "Stade Pierre-Mauroy", coachLille);
         
+        // Ajout des joueurs à l'équipe de Manchester City
+        teamCity.addPlayer(new Player("Haaland", "Erling", "Braut", "Norwegian", "Nike", "Forward", 9));
+        teamCity.addPlayer(new Player("De Bruyne", "Kevin", "De Bruyne", "Belgian", "Adidas", "Midfielder", 17));
+
+        // Ajout des joueurs à l'équipe de Lille
+        teamLille.addPlayer(new Player("David", "Jonathan", "David", "Canadian", "Puma", "Forward", 9));
         
-//        code here
- 
+        // Enregistrement des équipes dans des fichiers texte
+        teamCity.saveTeamToFile(currentDir + "/Manchester_City.txt");
+        teamLille.saveTeamToFile(currentDir + "/Lille.txt");
 
-        // Get user input
-        System.out.print("Enter your team name: ");
-        String userTeamName = scanner.nextLine();
 
-        System.out.print("Enter your home stadium: ");
-        String userStadium = scanner.nextLine();
+         // Get user input
+        System.out.print("Entrez le nom de votre équipe: ");
+        String userTeamName = scanner.nextLine().trim();
+        
+        System.out.print("Entrez le nom de l'équipe adverse: ");
+        String opponentTeamName = scanner.nextLine().trim();
 
-        System.out.print("Enter opponent team name: ");
-        String opponentTeamName = scanner.nextLine();
+        // Vérifier si les fichiers des équipes existent
+        if (!teamFileExists(userTeamName, currentDir)) {
+            System.out.println("L'équipe " + userTeamName + " n'existe pas.");
+            return; // Sortir du programme ou gérer autrement
+        }
 
-        System.out.print("Enter opponent's home stadium: ");
-        String opponentStadium = scanner.nextLine();
+        if (!teamFileExists(opponentTeamName, currentDir)) {
+            System.out.println("L'équipe " + opponentTeamName + " n'existe pas.");
+            return; // Sortir du programme ou gérer autrement
+        }
 
-        System.out.print("Enter the number of goals you want to score: ");
-        int userScore = scanner.nextInt();
+     
+        
+        // Créer et gérer le résultat du match
+        Teams userTeam = new Teams(userTeamName, "", null); 
+        Teams opponentTeam = new Teams(opponentTeamName, "", null);
+        new Matchs(userTeam, opponentTeam);
 
-        // Initialize teams
-        Teams userTeam = new Teams(userTeamName, userStadium);
-        Teams opponentTeam = new Teams(opponentTeamName, opponentStadium);
-
-        // Create and handle match result
-        new Matchs(userTeam, opponentTeam, userScore);
+        // Imprimer le classement après le match
+        ligue1.printLeaderboard("Ligue1");
 
         scanner.close();
-    
-//        Matchs match = new Matchs(teamsList, "Lyon");
-        
-        ligue1.printLeaderboard("Ligue1");
-
-
     }
-    
+
+    private static boolean teamFileExists(String teamName, String directory) {
+        // Créez le nom de fichier basé sur le nom de l'équipe
+            String fileName = teamName.replace(" ", "_") + ".txt";
+            File teamFile = new File(directory, fileName);
+            return teamFile.exists(); // Vérifie si le fichier existe
+    }
 }
-    

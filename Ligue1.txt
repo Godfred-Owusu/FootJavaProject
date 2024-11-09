@@ -1,5 +1,2 @@
-Losc,Pierre Mauroy,9,9,4,4,1,16
-Paris,Parc des Princes,0,4,0,1,3,1
-Nice,Alliance Riviera,1,3,1,0,1,4
-Lyon,Groupama Statium,0,9,1,5,3,8
-Real Madrid,Roubaix,0,1,1,0,0,3
+Manchester City,0,0,5,3,1,1,10
+Lille,0,0,5,1,1,3,4
